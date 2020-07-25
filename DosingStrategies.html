@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Doubly Robust Estimation of Optimal Dosing Strategies</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="summrized by cong jiang" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Doubly Robust Estimation of Optimal Dosing Strategies
+## Author: Juliana Schulz and Erica E. M. Moodie
+### summrized by cong jiang
+### 2020/07/14
+
+---
+
+
+class: inverse
+background-image:url("images/cool.png")
+#Notation
+
+Outcome model:
+`\(\mathrm{E}(Y \mid X=x, A=a)=f\left(x^{\beta} ; \beta\right)+\gamma\left(x^{\psi}, a ; \psi\right)\)`
+
+- For binary treatment setting:
+
+`\(\gamma\left(x^{\psi}, a ; \psi\right)=\psi^{\top} a x^{\psi}\)`
+--
+
+, thus,  `\(a^{opt} = I(\psi^{\top}x^{\psi} &gt; 0)\)` 
+--
+
+- For continuous treatment setting:
+
+`\(\gamma\left(x^{\psi}, a ; \psi\right)=\left(\psi^{(1)^{\top}}, \psi^{(2)^{\top}}\right)\left(a x^{\psi(1)}, a^{2} x^{\psi(2)}\right)^{\top}\)`
+--
+
+
+whenever `\(\psi^{(2)^{\top}} x^{\psi(2)}&lt;0\)`, the optimal rule `\(a^{opt} = -\psi^{(1)^{\top}} x^{\psi(1)}/2\psi^{(2)^{\top}} x^{\psi(2)}\)` 
+---
+
+# Genralized propensity score and dWOLS weights
+
+`\(\pi(a \mid x)=f_{A \mid X}(a \mid x), \ a \in \mathcal{A},\ x \in \mathcal{X}\)` 
+--
+
+### Theorem 2.1 Balancing Property for Continuous Treatment
+A weighted ordinary least squares regression based on the model 
+ 
+`$$\mathrm{E}(Y \mid X=x, A=a)=f\left(x^{\beta} ; \beta\right)+\gamma\left(x^{\psi}, a ; \psi\right)$$`
+
+will yield consistent estimators of ψ provided the weights satisfy the balancing condition
+`$$\pi(a \mid x) w(a ; x)=\pi\left(a^{\prime} \mid x\right) w\left(a^{\prime} ; x\right) \quad(1)$$`
+for any  `\(a \neq a^{\prime} \in \mathcal{A}\)`.
+
+
+---
+# Balancing Property for a Multi-level Treatment
+
+Remark 2.2 
+For a categorical treatment `\(A\)`, define the generalized propensity score as: 
+`$$\pi\left(a_{j} \mid x\right)=\mathrm{P}\left(A=a_{j} \mid X=x\right)$$`
+
+for any `\(a_j \in \mathcal{A}\)` with `\(\mathcal{A} = \{a_1, ..., a_m\}\)`. In this setting, the balancing condition can be shown to be 
+`$$\pi\left(a_{j} \mid x\right) w\left(a_{j} ; x\right)=\pi\left(a_{k} \mid x\right) w\left(a_{k} ; x\right) \quad(2)$$`
+for each `\(j, k \in \{1, ..., m\}\)`. 
+
+---
+## Weight Functions (continuous and discrete sense):
+
+
+- IPW : `\(w(a ; x)=1 / \pi(a \mid x)\)` for `\(a \in \mathcal{A}\)`. 
+
+
+--
+(Any weight that is proportional to the) IPW satisfy the balancing condition. 
+--
+
+- SIPW : `\(w(a ; x)= \pi(a) / \pi(a \mid x)\)`, where `\(\pi(a)\)` denotes the null treatment model which does not take covariate effects into account. 
+
+--
+
+
+SIPW fails to satisfy the balancing condition unless `\(\pi(a) \sim uniform\)` 
+
+
+--
+
+However, SIPW leads to consistent estimation (Robins 1999).
+
+--
+
+It construct a pseudo-population which correct for any inbalance in the covariate distributions accross all treatment levels. 
+
+--
+
+Saarela et al.(2015) examine the stabilized weights, providing an important sampling justification for the SIPW weighs.
+
+---
+
+- "absolute value" weights (Wallace and Moodie 2015)
+
+`\(w(a ; x)=|a-\mathrm{E}(A \mid X=x)|\)`, satisfy the balancing property for a binary treatment.
+
+--
+
+Li et al. (2018) explore the this weights for binary treatments in the context of fixed treatment regimes (referring to them as overlap weights)
+
+--
+
+
+- For a multinomial treatment, Li and Li (2019) define the overlap weights as 
+
+`$$w\left(a_{k} ; x\right)=\frac{1 / \pi\left(a_{k} \mid x\right)}{\sum_{j=1}^{m} 1 / \pi\left(a_{j} \mid x\right)}$$`
+for `\(a_{k} \in\left\{a_{1}, \ldots, a_{m}\right\}\)`
+
+These weights satisfy the balancing condition. 
+
+--
+
+- In the case of a continuous treatment allocation, the overlap weights can be defined as
+`$$w(a ; x)=\frac{1 / \pi(a \mid x)}{\int_{\mathcal{A}} 1 / \pi(u \mid x) d u}$$`
+
+for any `\(a \in \mathcal{A}\)`. Satisfying condition (1)
+
+---
+
+# Other forms of weight functions
+
+- For a categorical treatment with support `\(\mathcal{A} = \{a_1, ..., a_m\}\)`, the weight function
+`$$w\left(a_{k} ; x\right)=\left\{1-\pi\left(a_{i} \mid x\right)\right\} / \pi\left(a_{k} \mid x\right)$$` for any `\(a_j,\ a_k \in \mathcal{A}\)`
+
+    - satisfying condition (2)
+    
+--
+
+- For a continuous treatment, the weight function
+`$$w\left(a ; x\right)=\left\{1-\pi(a^{*} )\right\} / \pi\left(a \mid x\right)$$`
+for any `\(a,\ a^* \in \mathcal{A}\)`
+
+      - satisfying condition (1)
+    
+--
+
+some additional weight functions are in the Supplementary Material
+
+    
+---
+### Overlap Weighting (Li et al. 2018; Li et al. 2019; Thomas et al. 2020)
+
+Assigning weights to each patient that are proportional to the probability of that patient belonging to the opposite group, that is:
+
+--
+
+- treated patients are weighted by the probability of not receiving treatment (1 - PS)
+
+--
+
+- untreated patients are weighted by the probability of receiving the treatment (PS)
+
+--
+
+Smaller weights for extreme PS value ones (outliers);  Outliers who are nearly always treated (PS near 1) or never treated (PS near 0) contribute relatively less to the result. 
+
+Advantages: 1) No extreme weights; 2) Exact mean balance of covariates when PS is estimated via a logistic regression; 3) No need to choose an artificial cutoff point as trimming
+
+--
+
+The resulting target population mimics the characteristics of the pragmatic randomized trial. 
+
+---
+
+## Statistical Properties
+
+- exact balance on the mean of every measured covariate when the PS is estimated by a logistic regression
+
+--
+
+- among a large class of PS weighting methods (IPTW, matching etc.), optimal precision of the estimated association between treatment and outcomes ---  minimize the asymptotic variance of the weighted average treatment effect
+
+--
+
+- Overlap weighting can be as efficient as randomization if no adjustment was needed. 
+
+## Limitations
+
+can not just for patient characteristics that are not measured and included in the model for the PS. 
+
+---
+# Overlap Weighting More Details
+
+In defining a target population in terms of a tilting function `\(h(x)\)`, balance with respect to the target covariate distribution `\(f(x)h(x)\)` is obtained by setting weights proportional to `\(h(x)/ \pi(a | x)\)`.
+
+--
+
+For a binary treatment, choosing `\(h(x)=\pi(a \mid x)\{1-\pi(a \mid x)\}\)`, then the overlap weights is
+`\(w(1 ; x)=1-\pi(1 \mid x)\)` and `\(w(0 ; x)= \pi(1 \mid x)\)`
+
+--
+
+is identical to 
+
+--
+
+the absolute value weights considered by Wallace and Moodie (2015) : `\(w(a ; x)=|a-\mathrm{E}(A \mid X=x)|\)`
+
+---
+background-image: url(http://www2.stat.duke.edu/~fl35/Figures/OW_binary.png)
+background-size: 500px
+background-position: 50% 78%
+
+
+Overlap weights for two normally distributed groups with different means. In the upper panel, the red, blue, black dashed, and blue lines represent the density of the covariate in the control, treated, combined (where `\(h(x) = 1\)`), and overlap weighted populations `\(h(x)=\pi(a \mid x)\{1-\pi(a \mid x)\}\)`, respectively. In the lower panel, the red and green lines represent the overlap weights for treated and control units, and the tilting function `\(h(x)=\pi(a \mid x)\{1-\pi(a \mid x)\}\)`).
+
+
+
+
+
+
+---
+# Simulations
+
+Blip function: `$$\gamma(x, a ; \psi)=\psi_{0} a+\psi_{1} a x+\psi_{2} a^{2}+\psi_{3} a^{2} x$$`
+
+
+
+
+
+
+---
+# Normally-distributed Doses
+## homoscedastic treatment seeting (why call this ?)
+
+Continuous dose allocations: `\(A \sim \mathcal{N}\left(\alpha_{0}+\alpha_{1} x, 2\right)\)`, where `\(X \sim \mathcal{N}(10, 1)\)`
+
+--
+
+Treatment-free model : `\(f(x) = log(x) + sin(x) + x\)`, therefore, the outcome is:
+`$$Y=\log (x)+\sin (x)+x+a+a x+a^{2}+a^{2} x+\epsilon,$$`, for `\(\epsilon \sim \mathcal{N}(0, 1)\)`.
+
+--
+
+Scenarios 3 and 4: misspecified treatment-free model omitted the effects `\(log(x) + sin(x)\)`
+
+--
+
+Scenarios 2 and 4: treatment `\(A\)` was incorrectly assumed to follow `\(\mathcal{N}(\alpha_{0} ,2)\)`
+
+---
+# Multiple Stages
+
+Covariates `\(X_1\)` and `\(X_2\)` were generated from `\(\mathcal{N}(10 ,1)\)`. Treatment `\(A_{j} \sim \mathcal{N}\left(\alpha_{j 0}+\alpha_{j 1} X_{j}, 1\right)\)`, for `\(j = 1, 2\)`. 
+
+--
+
+The blip function was chosen to be `$$\gamma_{1}\left(x_{j}, a_{j} ; \psi_{j}\right)=\left(\psi_{j 0}+\psi_{j 1} x_{j}\right) a_{j}+\psi_{j 2} a_{j}^{2}$$`, with `\(\psi_{j 0}=\psi_{j 1}=1 \text { and } \psi_{j 2}=-1 \text { for } j=1,2,\)`
+
+--
+
+Each stage the optimal dose is `$$a_{j}^{o p t}=-\left(\psi_{j 0}+\psi_{j 1} x_{j}\right) / 2 \psi_{j 2}$$`
+
+--
+
+Treatment-free model: `$$\log \left(X_{1}\right)+\sin \left(X_{1}\right)+\log \left(X_{2}\right)+\sin \left(X_{2}\right)$$`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+class:center
+background-image: url(https://upload.wikimedia.org/wikipedia/commons/b/be/Sharingan_triple.svg)
+
+
+
+Slides are created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+
+The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](http://yihui.org/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+
+
+???
+
+Image credit: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Sharingan_triple.svg)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
