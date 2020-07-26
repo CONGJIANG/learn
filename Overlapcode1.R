@@ -120,7 +120,7 @@ OW <- function(y, z, X, estimand = 1){
 ###########################################################
 # simulate a data set with six potential confounders
 require(mvtnorm)
-
+library(mvtnorm)
 n <- 1000
 set.seed(123)
 X <- rmvnorm(n, rep(0,6), diag(6))
@@ -142,7 +142,7 @@ res$se
 
 # compare with canonical treatment model
 require(survey)
-
+library(survey)
 ehat <- as.numeric(glm(z ~ X,family=binomial(link="logit"))$fitted.values)
 w <- rep(NA, n)
 w[z == 1] <- 1-ehat[z == 1]
@@ -156,6 +156,7 @@ tab <- summary(svyglm(y ~ z,design=design,family=gaussian(link="identity")))$coe
 tab[2,1]
 tab[2,2]  # conservative variance
 
+lm(y ~ z, weights = w)
 ###########################################################
 # Illustrative calculations (2) - ratio
 ###########################################################
