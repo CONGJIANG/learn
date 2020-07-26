@@ -1,19 +1,5 @@
 #############################################################################################
 # Overlap weighting and sandwich variance with a logistic propensity score model
-# Applicable to binary treatments, see the following Ref. for details
-
-# Ref. Li F, Thomas LE, Li F. (2018) Addressing Extreme Propensity Scores via the 
-# Overlap Weights. American Journal of Epidemiology
-
-# This R program is intended to demonstrate the calculations of ATO and its variance
-# as given in equations (2)-(4) of Li et al. (2018)
-
-# 09/26/2018 The program has been extended to allow inference for causal risk ratio
-#            and causal odds ratio with binary outcomes
-
-# Our group is currently working on an R software that includes the functionality 
-# of this demonstration program. 
-
 # The following quantities are output from the program:
 # (1) tau: estimator of the causal quantity among the overlap population
 # (2) se:  empirical sandwich standard error
@@ -21,14 +7,55 @@
 # (3) ucl: upper confidence limit
 # (4) asd: absolute standardized difference (should be 0, see Web Appendix 2 of Li et al.)
 
-# Frank Li; Sep 2018
-
 # INPUT
 # y: the n x 1 vector of outcomes
 # z: the n x 1 vector of treatment indicators (e.g., trt = 1; control = 0)
 # X: the n x p matrix of covariates for the PS model (excluding intercept term)
 # estimand: "1" (ATO/risk difference), "2" (log risk ratio), "3" (log odds ratio)
 #############################################################################################
+library(PSweight)
+
+data("psdata")
+ps.formula <- trt ~ cov1 + cov2+cov3+cov4+cov5+cov6
+msstat <- SumStat(ps.formula, trtgrp="2", data=psdata,
+                  weight=c("ATE","ATO","ATT"))
+plot(msstat, type="hist")
+plot(msstat, type="balance", weighted.var=TRUE, threshold=0.1, metric="ASD")
+
+# psdata n = 1500
+psdata[1:3, ]
+
+# SumStat Calculate summary statistics for propensity score weight
+summary(msstat)
+# importing user-supplied propensity scores "e.h"
+fit <- nnet::multinom(formula=ps.formula, data=psdata, maxit=500, trace=FALSE)
+e.h <- fit$fitted.values
+varname <- c("cov1","cov2","cov3","cov4","cov5","cov6")
+msstat0 <- SumStat(zname="trt", xname=varname, data=psdata, ps.estimate=e.h,
+                   trtgrp="2", weight=c("ATE",'ATT',"ATO"))
+summary(msstat0)
+
+
+###########################
+# PSweight Estimate causal effects by propensity score weighting
+
+data("psdata")
+# the propensity and outcome models
+ps.formula <- trt~cov1+cov2+cov3+cov4+cov5+cov6
+out.formula <- Y~cov1+cov2+cov3+cov4+cov5+cov6
+# without augmentation
+ato1<-PSweight(ps.formula = ps.formula,yname = 'Y',data = psdata,weight = 'ATO')
+summary(ato1)
+# augmented weighting estimator
+ato2<-PSweight(ps.formula = ps.formula,yname = 'Y',data = psdata,
+               augmentation = TRUE,out.formula = out.formula,family = 'gaussian',weight = 'ATO')
+summary(ato2)
+
+example("PSweight")
+
+
+
+
 OW <- function(y, z, X, estimand = 1){
   
   # module for checking balance in the weighted sample
